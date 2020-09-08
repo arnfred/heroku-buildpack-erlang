@@ -92,13 +92,13 @@ if [ $BINARY_RELEASES ]; then
     fi
     echo "-----> Install succeeded"
 else
-    DEFAULT_OTP_VERSION="OTP-22.2.7"
+    DEFAULT_OTP_VERSION="OTP-20.1"
     if [ -f ${build}/.preferred_otp_version ]; then
-        OTP_VERSION=$(cat ${build}/.preferred_otp_version)
+            OTP_VERSION=$(cat ${build}/.preferred_otp_version)
     fi
     ver=${OTP_VERSION:=${DEFAULT_OTP_VERSION}}
     tarball="${ver}.tgz"
-    location="heroku/heroku-18/"
+    location="heroku/heroku-16/"
     strip=""
     OTP_TARBALL_URL="https://svn.marco-gatti.com/${location}${tarball}"
     ERLROOT=${build}/otp
