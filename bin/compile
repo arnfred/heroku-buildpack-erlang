@@ -92,34 +92,14 @@ if [ $BINARY_RELEASES ]; then
     fi
     echo "-----> Install succeeded"
 else
-    case $STACK in
-        heroku-16)
-            echo "-----> Stack is heroku-16"
-            DEFAULT_OTP_VERSION="OTP-20.1"
-            if [ -f ${build}/.preferred_otp_version ]; then
-                OTP_VERSION=$(cat ${build}/.preferred_otp_version)
-            fi
-            ver=${OTP_VERSION:=${DEFAULT_OTP_VERSION}}
-            tarball="${ver}.tgz"
-            location="heroku/heroku-16/"
-            strip=""
-            ;;
-        heroku-18)
-            echo "-----> Stack is heroku-18"
-            DEFAULT_OTP_VERSION="OTP-22.2.7"
-            if [ -f ${build}/.preferred_otp_version ]; then
-                OTP_VERSION=$(cat ${build}/.preferred_otp_version)
-            fi
-            ver=${OTP_VERSION:=${DEFAULT_OTP_VERSION}}
-            tarball="${ver}.tgz"
-            location="heroku/heroku-18/"
-            strip=""
-            ;; 
-        *)
-            echo "-----> Sorry, stack $STACK is not available"
-            exit 1
-            ;;
-    esac
+    DEFAULT_OTP_VERSION="OTP-22.2.7"
+    if [ -f ${build}/.preferred_otp_version ]; then
+        OTP_VERSION=$(cat ${build}/.preferred_otp_version)
+    fi
+    ver=${OTP_VERSION:=${DEFAULT_OTP_VERSION}}
+    tarball="${ver}.tgz"
+    location="heroku/heroku-18/"
+    strip=""
     OTP_TARBALL_URL="https://svn.marco-gatti.com/${location}${tarball}"
     ERLROOT=${build}/otp
     PROFILE=${HOME}/.profile.d
@@ -187,10 +167,15 @@ else
             ./rebar get-deps compile 2>&1 | sed -u 's/^/       /'
             ;;
         "rebar3")
-            echo "-----> Building release with Rebar3"
+            DEFAULT_REBAR_PROFILE="default"
+            if [ -f ${build}/.preferred_rebar_profile ]; then
+                REBAR_PROFILE=$(cat ${build}/.preferred_rebar_profile)
+            fi
+            profile=${REBAR_PROFILE:=${DEFAULT_REBAR_PROFILE}}
+            echo "-----> Building release with Rebar3 using $profile profile"
             TERM=dumb
             ./rebar3 update
-            ./rebar3 release -i true --dev-mode false  2>&1 | sed -u 's/^/       /'
+            ./rebar3 as $profile release 2>&1 | sed -u 's/^/       /'
             ;;
         "erlang.mk")
 	        echo "-----> Building release with erlang.mk"
